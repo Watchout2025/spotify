@@ -6696,7 +6696,7 @@ function formatDateAdded(dateString) {
         // Fetch New Releases
         async function fetchNewReleases() {
             try {
-                const proxyUrl = 'https://www.jiosaavn.com/api.php?__call=content.getAlbums&api_version=4&_format=json&_marker=0&n=50&p=1&ctx=wap6dot0;
+                const proxyUrl = 'https://www.jiosaavn.com/api.php?__call=content.getAlbums&api_version=4&_format=json&_marker=0&n=50&p=1&ctx=wap6dot0';
                 const res = await fetch(proxyUrl);
                 if (!res.ok) throw new Error('API error');
                 const data = await res.json();
