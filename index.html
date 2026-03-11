@@ -6426,7 +6426,7 @@ function addAlbumToLibrary() {
             homeView.classList.add('hidden');
 
             try {
-                const res = await fetch(`https://saavn-api-jet.vercel.app/api/playlists?id=${id}`);
+                const res = await fetch(`https://saavn-api-jet.vercel.app/api/playlists?id=${id}&limit=100`);
                 const data = await res.json();
                 const playlist = data.data;
                 // Clear other context
