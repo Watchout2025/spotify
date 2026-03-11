@@ -6684,7 +6684,6 @@ function formatDateAdded(dateString) {
         // Fetch Charts
         async function fetchCharts() {
             try {
-                const proxyUrl = 'https://www.jiosaavn.com/api.php?__call=content.getCharts&api_version=4&_format=json&_marker=0&ctx=wap6dot0';
                 const res = await fetch("/api/charts");
                 const data = await res.json();
                 renderCharts(data);
@@ -6696,8 +6695,7 @@ function formatDateAdded(dateString) {
         // Fetch New Releases
         async function fetchNewReleases() {
             try {
-                const proxyUrl = 'https://www.jiosaavn.com/api.php?__call=content.getAlbums&api_version=4&_format=json&_marker=0&n=50&p=1&ctx=wap6dot0';
-                const res = await fetch(proxyUrl);
+                const res = await fetch("/api/newReleases");
                 if (!res.ok) throw new Error('API error');
                 const data = await res.json();
                 renderNewReleases(data);
@@ -6751,8 +6749,7 @@ function formatDateAdded(dateString) {
         // Fetch Featured Playlists
         async function fetchFeaturedPlaylists() {
             try {
-                const proxyUrl = 'https://www.jiosaavn.com/api.php?__call=content.getFeaturedPlaylists&fetch_from_serialized_files=true&p=1&n=50&api_version=4&_format=json&_marker=0&ctx=wap6dot0';
-                const res = await fetch(proxyUrl);
+                const res = await fetch("api/featuredPlaylists");
                 if (!res.ok) throw new Error('API error');
                 const data = await res.json();
                 renderFeaturedPlaylists(data);
@@ -6798,8 +6795,7 @@ function formatDateAdded(dateString) {
         // Fetch Top Artists
         async function fetchTopArtists() {
             try {
-                const proxyUrl = 'https://www.jiosaavn.com/api.php?__call=social.getTopArtists&api_version=4&_format=json&_marker=0&ctx=web6dot0';
-                const res = await fetch(proxyUrl);
+                const res = await fetch("api/topArtists");
                 if (!res.ok) throw new Error('API error');
                 const data = await res.json();
                 renderTopArtists(data);
