@@ -6685,7 +6685,7 @@ function formatDateAdded(dateString) {
         async function fetchCharts() {
             try {
                 const proxyUrl = 'https://www.jiosaavn.com/api.php?__call=content.getCharts&api_version=4&_format=json&_marker=0&ctx=wap6dot0';
-                const res = await fetch(proxyUrl);
+                const res = await fetch("/api/charts");
                 const data = await res.json();
                 renderCharts(data);
             } catch (err) {
