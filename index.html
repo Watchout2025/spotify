@@ -7063,27 +7063,47 @@ function formatDateAdded(dateString) {
     }
 </style>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const rightSidebar = document.querySelector('.right-sidebar');
-    if (!rightSidebar) return;
+document.addEventListener("DOMContentLoaded", () => {
 
-    let startY = 0;
-    let startTime = 0;
+  const player = document.querySelector(".right-sidebar");
+  const overlay = document.querySelector(".right-sidebar-overlay");
 
-    rightSidebar.addEventListener('pointerdown', function(e) {
-        startY = e.clientY;
-        startTime = Date.now();
-    }, { passive: true });
+  if (!player) return;
 
-    rightSidebar.addEventListener('pointerup', function(e) {
-        const dy = e.clientY - startY;
-        const dt = Date.now() - startTime;
-        if (dy > 80 && dt < 300) {
-            rightSidebar.classList.remove('mobile-open');
-            const overlay = document.querySelector('.right-sidebar-overlay');
-            if (overlay) overlay.classList.remove('active');
-        }
-    }, { passive: true });
+  let startY = 0;
+  let currentY = 0;
+  let isDragging = false;
+
+  player.addEventListener("touchstart", (e) => {
+    startY = e.touches[0].clientY;
+    isDragging = true;
+  }, { passive: true });
+
+  player.addEventListener("touchmove", (e) => {
+    if (!isDragging) return;
+
+    currentY = e.touches[0].clientY;
+    const diff = currentY - startY;
+
+    if (diff > 0) {
+      player.style.transform = `translateY(${diff}px)`;
+    }
+  }, { passive: true });
+
+  player.addEventListener("touchend", () => {
+    if (!isDragging) return;
+
+    const diff = currentY - startY;
+    isDragging = false;
+
+    if (diff > 120) {
+      player.classList.remove("mobile-open");
+      if (overlay) overlay.classList.remove("active");
+    }
+
+    player.style.transform = "";
+  });
+
 });
 </script>
 <style>
