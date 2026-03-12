@@ -3541,7 +3541,59 @@
                     </button>
                 </div>
                 <div class="now-playing-artist" id="now-playing-artist" onclick="if (currentArtistId) searchArtist(currentArtistId, currentArtistData?.name || '')">Select a song</div>
+                <!-- Progress Bar -->
+    <div class="progress-container" style="color:#fff; margin-bottom: 20px;">
+        <input type="range" class="track-progress" value="30" min="0" max="100" style="width: 100%; accent-color: #fff; cursor: pointer;">
+        <div style="display:flex; flex-direction:row; width:100%; justify-content:space-between; margin-top:8px; font-size: 12px; color: #b3b3b3;">
+            <span class="track-current-time">1:24</span>
+            <span class="track-duration">3:45</span>
+        </div>
+    </div>
 
+    <!-- Primary Playback Controls -->
+    <div class="player-controls" style="display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 30px;">
+        <!-- Previous -->
+        <button id="prev-track" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: none; border: none; cursor: pointer; outline: none; padding: 0;">
+            <svg width="35" height="35" viewBox="0 0 24 24" fill="#ffffff">
+                <path d="M18 5.5v13L7 12l11-6.5zM6 5a1 1 0 0 0-1 1v12a1 1 0 1 0 2 0V6a1 1 0 0 0-1-1z"/>
+            </svg>
+        </button>
+
+        <!-- Play/Pause -->
+        <button class="track-play-btn" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: #ffffff; border: none; border-radius: 50%; cursor: pointer; outline: none; padding: 0;">
+            <svg width="24" height="24" viewBox="0 0 16 16" fill="#000000">
+                <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path>
+            </svg>
+        </button>
+
+        <!-- Next -->
+        <button id="next-track" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: none; border: none; cursor: pointer; outline: none; padding: 0;">
+            <svg width="35" height="35" viewBox="0 0 24 24" fill="#ffffff">
+                <path d="M6 5.5v13l11-6.5L6 5.5zM18 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1z"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Secondary Actions Row (Floating Right) -->
+    <div class="secondary-actions" style="display: flex; justify-content: flex-end; align-items: center; gap: 16px; margin-bottom: 12px; padding-right: 4px;">
+        <!-- Share Button (Google Material Style) -->
+        <button id="music-share-button" title="Share" style="background: none; border: none; cursor: pointer; padding: 0; outline: none;">
+            <svg width="22" height="22" viewBox="0 -960 960 960" fill="#b3b3b3">
+                <path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5t-38-23.5L354-480l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Z"/>
+            </svg>
+        </button>
+        <!-- Queue Button -->
+        <button id="music-queue-button" title="Queue" style="background: none; border: none; cursor: pointer; padding: 0; outline: none;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3b3b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="8" y1="6" x2="21" y2="6"></line>
+                <line x1="8" y1="12" x2="21" y2="12"></line>
+                <line x1="8" y1="18" x2="21" y2="18"></line>
+                <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                <line x1="3" y1="18" x2="3.01" y2="18"></line>
+            </svg>
+        </button>
+    </div>       
                 <!-- About Artist Card -->
                 <div id="artist-card" class="artist-card" style="display: none;">
                     <div class="artist-card-header">About the Artist</div>
