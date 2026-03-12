@@ -7082,29 +7082,30 @@ document.addEventListener("DOMContentLoaded", () => {
     startY = e.touches[0].clientY;
     dragging = true;
     player.style.transition = "none";
-  }, { passive: true });
+  });
 
   player.addEventListener("touchmove", (e) => {
     if (!dragging) return;
 
     currentY = e.touches[0].clientY;
-    let diff = currentY - startY;
+    const diff = currentY - startY;
 
     if (diff > 0) {
+      e.preventDefault(); // VERY IMPORTANT
       player.style.transform = `translateY(${diff}px)`;
     }
-
-  }, { passive: true });
+  }, { passive:false });
 
   player.addEventListener("touchend", () => {
     if (!dragging) return;
 
     dragging = false;
-    let diff = currentY - startY;
+    const diff = currentY - startY;
 
     player.style.transition = "transform 0.25s ease";
 
     if (diff > 120) {
+
       player.style.transform = "translateY(100%)";
 
       setTimeout(() => {
@@ -7114,6 +7115,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }, 250);
 
     } else {
+
       player.style.transform = "translateY(0)";
     }
   });
