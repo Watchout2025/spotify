@@ -7076,48 +7076,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let startY = 0;
   let currentY = 0;
-  let dragging = false;
+  let isDragging = false;
 
   player.addEventListener("touchstart", (e) => {
     startY = e.touches[0].clientY;
-    dragging = true;
-    player.style.transition = "none";
-  });
+    isDragging = true;
+  }, { passive: true });
 
   player.addEventListener("touchmove", (e) => {
-    if (!dragging) return;
+    if (!isDragging) return;
 
     currentY = e.touches[0].clientY;
     const diff = currentY - startY;
 
     if (diff > 0) {
-      e.preventDefault(); // VERY IMPORTANT
       player.style.transform = `translateY(${diff}px)`;
     }
-  }, { passive:false });
+  }, { passive: true });
 
   player.addEventListener("touchend", () => {
-    if (!dragging) return;
+    if (!isDragging) return;
 
-    dragging = false;
     const diff = currentY - startY;
-
-    player.style.transition = "transform 0.25s ease";
+    isDragging = false;
 
     if (diff > 120) {
-
-      player.style.transform = "translateY(100%)";
-
-      setTimeout(() => {
-        player.classList.remove("mobile-open");
-        if (overlay) overlay.classList.remove("active");
-        player.style.transform = "";
-      }, 250);
-
-    } else {
-
-      player.style.transform = "translateY(0)";
+      player.classList.remove("mobile-open");
+      if (overlay) overlay.classList.remove("active");
     }
+
+    player.style.transform = "";
   });
 
 });
