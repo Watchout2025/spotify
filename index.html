@@ -7081,7 +7081,8 @@ document.addEventListener("DOMContentLoaded", () => {
   player.addEventListener("touchstart", (e) => {
     startY = e.touches[0].clientY;
     isDragging = true;
-  }, { passive: true });
+    player.style.transition = "none"; // disable animation while dragging
+  });
 
   player.addEventListener("touchmove", (e) => {
     if (!isDragging) return;
@@ -7090,9 +7091,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const diff = currentY - startY;
 
     if (diff > 0) {
+      e.preventDefault(); // IMPORTANT
       player.style.transform = `translateY(${diff}px)`;
     }
-  }, { passive: true });
+  }, { passive: false });
 
   player.addEventListener("touchend", () => {
     if (!isDragging) return;
@@ -7100,12 +7102,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const diff = currentY - startY;
     isDragging = false;
 
+    player.style.transition = "transform 0.25s ease";
+
     if (diff > 120) {
-      player.classList.remove("mobile-open");
-      if (overlay) overlay.classList.remove("active");
+      player.style.transform = "translateY(100%)";
+
+      setTimeout(() => {
+        player.classList.remove("mobile-open");
+        if (overlay) overlay.classList.remove("active");
+        player.style.transform = "";
+      }, 250);
+
+    } else {
+      player.style.transform = "translateY(0)";
     }
 
-    player.style.transform = "";
   });
 
 });
@@ -7128,6 +7139,10 @@ document.addEventListener("DOMContentLoaded", () => {
     #home-view {
         padding: 24px 0 124px 0 !important;
     }
+}
+    .right-sidebar{
+  will-change: transform;
+  touch-action: none;
 }
 </style>
 </body>
