@@ -2789,11 +2789,15 @@
             /* Header adjustments */
             .header {
                 padding: 8px 12px;
-                gap: 8px;
+                flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        min-height: 64px;
+        height: auto;
             }
 
             .header-left {
-                left: 12px;
+                position: static;
             }
 
             .logo-spotify {
