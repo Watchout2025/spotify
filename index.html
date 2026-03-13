@@ -3286,7 +3286,7 @@
             }
 
             /* Hide search bar by default on mobile, show only in search view */
-            body[data-view="search"] .search-container {
+            body[data-view="search"] .header-center {
                 display: flex !important;
             }
 
@@ -3441,10 +3441,10 @@
         }
 
         @media (max-width: 768px) {
-            .search-container {
+            .header-center {
                 display: none;
             }
-            body.show-search .search-container {
+            body.show-search .header-center {
                 display: flex !important;
             }
         }
@@ -6828,7 +6828,7 @@ function addAlbumToLibrary() {
             history.pushState({ view: 'home' }, '', '#home');
             // On mobile, hide search bar when going home
             if (window.innerWidth <= 768) {
-                const sc = document.querySelector('.search-container');
+                const sc = document.querySelector('.header-center');
                 if (sc) sc.style.display = 'none';
             }
         }
@@ -6846,7 +6846,7 @@ function addAlbumToLibrary() {
                 homeView.classList.add('hidden');
                 searchView.classList.remove('hidden');
                 libraryView.classList.add('hidden');
-                const searchContainer = document.querySelector('.search-container');
+                const searchContainer = document.querySelector('.header-center');
                 if (searchContainer) {
                     searchContainer.style.display = 'flex';
                 }
@@ -6855,7 +6855,7 @@ function addAlbumToLibrary() {
                 closeMobileMenu();
             } else if (view === 'library') {
                 toggleMobileMenu();
-                const sc = document.querySelector('.search-container');
+                const sc = document.querySelector('.header-center');
                 if (sc) sc.style.display = 'none';
                 closeRightSidebar();
             } else if (view === 'create') {
@@ -6877,7 +6877,7 @@ function addAlbumToLibrary() {
             if (activeBtn) activeBtn.classList.add('active');
             // Toggle search bar on mobile
             if (window.innerWidth <= 768) {
-                const searchContainer = document.querySelector('.search-container');
+                const searchContainer = document.querySelector('.header-center');
                 if (searchContainer) {
                     searchContainer.style.display = (view === 'search') ? 'flex' : 'none';
                 }
@@ -7243,7 +7243,7 @@ function formatDateAdded(dateString) {
 (function() {
     function updateSearchBar(view) {
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
-        const sc = document.querySelector('.search-container');
+        const sc = document.querySelector('.header-center');
         if (!sc) return;
         if (isMobile) {
             sc.style.display = (view === 'search') ? 'flex' : 'none';
