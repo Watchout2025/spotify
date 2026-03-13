@@ -6855,6 +6855,8 @@ function addAlbumToLibrary() {
                 closeMobileMenu();
             } else if (view === 'library') {
                 toggleMobileMenu();
+                const sc = document.querySelector('.search-container');
+                if (sc) sc.style.display = 'none';
                 closeRightSidebar();
             } else if (view === 'create') {
                 createPlaylist();
