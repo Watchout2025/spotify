@@ -2829,7 +2829,7 @@
                 top: 64px;
                 left: -100%;
                 width: 100%;
-                height: calc(100vh - 64px - 140px);
+                height: calc(100vh - 64px - 56px);
                 z-index: 200;
                 border-radius: 0;
                 overflow-y: auto;
@@ -2837,6 +2837,7 @@
 
             .sidebar.mobile-open {
                 left: 0;
+                transition: none;
                 width: 100% !important;
             }
 
@@ -3099,7 +3100,7 @@
                 background: var(--bg-secondary);
                 opacity: 0.95;
                 border-top: 1px solid var(--bg-tertiary);
-                z-index: 110;
+                z-index: 99;
                 justify-content: space-around;
                 align-items: center;
             }
