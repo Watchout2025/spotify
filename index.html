@@ -6849,6 +6849,10 @@ function addAlbumToLibrary() {
                 homeView.classList.add('hidden');
                 searchView.classList.remove('hidden');
                 libraryView.classList.add('hidden');
+                const searchContainer = document.querySelector('.search-container');
+                if (searchContainer) {
+                    searchContainer.style.display = 'flex';
+                }
                 searchInput.focus();
                 history.pushState({ view: 'search' }, '', '#search');
                 closeMobileMenu();
