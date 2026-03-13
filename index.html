@@ -3543,10 +3543,14 @@
                 <div class="now-playing-artist" id="now-playing-artist" onclick="if (currentArtistId) searchArtist(currentArtistId, currentArtistData?.name || '')">Select a song</div>
                 <!-- Progress Bar -->
     <div class="progressbar-container" style="color:#fff; margin-bottom: 20px;">
-        <input type="range" class="track-progress" value="30" min="0" max="100" style="width: 100%; accent-color: #fff; cursor: pointer;">
-        <div style="display:flex; flex-direction:row; width:100%; justify-content:space-between; margin-top:8px; font-size: 12px; color: #b3b3b3;">
-            <span class="track-current-time">1:24</span>
-            <span class="track-duration">3:45</span>
+        <div id="sidebar-progress-bar" style="width:100%; height:4px; background:#4D4D4D; border-radius:2px; cursor:pointer; position:relative; margin-bottom:8px;"
+             onclick="sidebarSeek(event)" onmousedown="sidebarStartDrag(event)">
+            <div id="sidebar-progress" style="height:100%; background:#fff; border-radius:2px; width:0%; transition: background 0.2s;"></div>
+            <div id="sidebar-progress-thumb" style="position:absolute; width:12px; height:12px; border-radius:50%; background:#fff; top:50%; transform:translate(-50%,-50%); left:0%; pointer-events:none; opacity:0; transition:opacity 0.2s;"></div>
+        </div>
+        <div style="display:flex; flex-direction:row; width:100%; justify-content:space-between; font-size: 12px; color: #b3b3b3;">
+            <span id="sidebar-current-time">0:00</span>
+            <span id="sidebar-total-time">0:00</span>
         </div>
     </div>
 
@@ -3560,9 +3564,12 @@
         </button>
 
         <!-- Play/Pause -->
-        <button onclick="togglePlay()" class="track-play-btn" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: #ffffff; border: none; border-radius: 50%; cursor: pointer; outline: none; padding: 0;">
-            <svg width="24" height="24" viewBox="0 0 16 16" fill="#000000">
+        <button onclick="togglePlay()" id="sidebar-play-btn" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: #ffffff; border: none; border-radius: 50%; cursor: pointer; outline: none; padding: 0;">
+            <svg id="sidebar-play-icon" width="24" height="24" viewBox="0 0 16 16" fill="#000000">
                 <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path>
+            </svg>
+            <svg id="sidebar-pause-icon" width="24" height="24" viewBox="0 0 16 16" fill="#000000" style="display:none;">
+                <path d="M2.7 1a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7zm8 0a.7.7 0 0 0-.7.7v12.6a.7.7 0 0 0 .7.7h2.6a.7.7 0 0 0 .7-.7V1.7a.7.7 0 0 0-.7-.7z"></path>
             </svg>
         </button>
 
@@ -4004,6 +4011,8 @@ searchInput.addEventListener('input', () => {
         audio.addEventListener('ended', playNext);
         audio.addEventListener('loadedmetadata', () => {
             document.getElementById('total-time').textContent = formatTime(audio.duration);
+            const sidebarTotal = document.getElementById('sidebar-total-time');
+            if (sidebarTotal) sidebarTotal.textContent = formatTime(audio.duration);
         });
 
         // Navigation
@@ -5890,6 +5899,11 @@ function updateAddButtonIcon() {
 
             playIcon.style.display = isPlaying ? 'none' : 'block';
             pauseIcon.style.display = isPlaying ? 'block' : 'none';
+            // Sync sidebar play/pause icons
+            const sidebarPlayIcon = document.getElementById('sidebar-play-icon');
+            const sidebarPauseIcon = document.getElementById('sidebar-pause-icon');
+            if (sidebarPlayIcon) sidebarPlayIcon.style.display = isPlaying ? 'none' : 'block';
+            if (sidebarPauseIcon) sidebarPauseIcon.style.display = isPlaying ? 'block' : 'none';
 
             // Update add button icon based on whether song is in playlists
             updateAddButtonIcon();
@@ -6021,6 +6035,15 @@ function updateAddButtonIcon() {
             if (thumb) {
                 thumb.style.left = percent + '%';
             }
+            // Sync sidebar progress bar
+            const sidebarProgress = document.getElementById('sidebar-progress');
+            const sidebarThumb = document.getElementById('sidebar-progress-thumb');
+            const sidebarCurrent = document.getElementById('sidebar-current-time');
+            const sidebarTotal = document.getElementById('sidebar-total-time');
+            if (sidebarProgress) sidebarProgress.style.width = (isNaN(percent) ? 0 : percent) + '%';
+            if (sidebarThumb) sidebarThumb.style.left = (isNaN(percent) ? 0 : percent) + '%';
+            if (sidebarCurrent) sidebarCurrent.textContent = formatTime(audio.currentTime);
+            if (sidebarTotal && audio.duration) sidebarTotal.textContent = formatTime(audio.duration);
         }
 
         function seek(e) {
@@ -6028,6 +6051,43 @@ function updateAddButtonIcon() {
             const percent = (e.clientX - rect.left) / rect.width;
             audio.currentTime = percent * audio.duration;
         }
+
+        // Sidebar progress bar seek & drag
+        function sidebarSeek(e) {
+            const bar = document.getElementById('sidebar-progress-bar');
+            if (!bar || !audio.duration) return;
+            const rect = bar.getBoundingClientRect();
+            const percent = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+            audio.currentTime = percent * audio.duration;
+        }
+
+        let isSidebarDragging = false;
+        function sidebarStartDrag(e) {
+            isSidebarDragging = true;
+            sidebarSeek(e);
+        }
+        document.addEventListener('mousemove', (e) => {
+            if (!isSidebarDragging) return;
+            sidebarSeek(e);
+        });
+        document.addEventListener('mouseup', () => { isSidebarDragging = false; });
+
+        // Show/hide sidebar progress thumb on hover
+        document.addEventListener('DOMContentLoaded', () => {
+            const bar = document.getElementById('sidebar-progress-bar');
+            const thumb = document.getElementById('sidebar-progress-thumb');
+            const progressFill = document.getElementById('sidebar-progress');
+            if (bar && thumb && progressFill) {
+                bar.addEventListener('mouseenter', () => {
+                    thumb.style.opacity = '1';
+                    progressFill.style.background = 'var(--accent)';
+                });
+                bar.addEventListener('mouseleave', () => {
+                    thumb.style.opacity = '0';
+                    progressFill.style.background = '#fff';
+                });
+            }
+        });
 
         function startProgressDrag(e) {
             isDraggingProgress = true;
