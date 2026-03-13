@@ -5891,9 +5891,7 @@ searchInput.addEventListener('input', () => {
         // Mobile menu functions
         function toggleMobileMenu() {
             const sidebar = document.querySelector('.sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            sidebar.classList.toggle('mobile-open');
-            overlay.classList.toggle('active');
+            sidebar.classList.add('mobile-open');
         }
 
         function closeMobileMenu() {
