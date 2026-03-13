@@ -4694,8 +4694,10 @@ searchInput.addEventListener('input', () => {
                         <div class="recent-item-info">
                             <div class="recent-item-name">${name}</div>
                         </div>
-                        <button class="play-btn" onclick="event.stopPropagation(); playSong('${safeId}')">
-                            <svg viewBox="0 0 16 16"><path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"/></svg>
+                        <button class="play-btn" onclick="event.stopPropagation(); playAll('${safeId}', '${type}')">
+                           <svg viewBox="0 0 16 16">
+                              <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"/>
+                           </svg>
                         </button>
                     </div>`;
             });
@@ -5235,56 +5237,88 @@ searchInput.addEventListener('input', () => {
         }
 
         // Play all songs from current view (Liked Songs, Artist, or Playlist)
-        function playAll() {
-            if (!currentSongList || currentSongList.length === 0) {
-                showToast('No songs to play');
-                return;
-            }
-            // Add album to recent when play all is clicked
-            if (currentAlbum) {
-                addToRecent({
-                    id: currentAlbum.id,
-                    title: currentAlbum.name,
-                    type: 'album',
-                    image: currentAlbum.image[2]?.url || currentAlbum.image[0]?.url || '',
-                    artist: currentAlbum.artist || (currentAlbum.songs?.[0]?.artists?.primary?.[0]?.name) || ''
-                });
-            }
-            // Add artist to recent when play all is clicked
-            if (currentArtist) {
-                addToRecent({
-                    id: currentArtist.id,
-                    title: currentArtist.name,
-                    type: 'artist',
-                    image: currentArtist.image?.[2]?.url || currentArtist.image?.[0]?.url || ''
-                });
-            }
-            // Add playlist to recent when play all is clicked
-            if (currentPlaylist) {
-                const firstSong = currentPlaylist.songs?.[0];
-                const albumArt = firstSong?.image?.[2]?.url || firstSong?.image?.[0]?.url || currentPlaylist.image?.[2]?.url || currentPlaylist.image?.[0]?.url || 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300"%3E%3Crect fill="%231DB954" width="300" height="300"/%3E%3Csvg%3E';
-                addToRecent({
-                    id: currentPlaylistIndex !== null ? currentPlaylistIndex : (currentPlaylist.id || currentPlaylist.title || 'unknown'),
-                    title: currentPlaylist.name || currentPlaylist.title,
-                    type: 'playlist',
-                    image: albumArt
-                });
-            }
-            // Add Liked Songs to recent when play all is clicked
-            if (currentListSource === 'liked') {
-                addToRecent({
-                    id: 'liked',
-                    title: 'Liked Songs',
-                    type: 'playlist',
-                    image: 'https://misc.scdn.co/liked-songs/liked-songs-300.jpg'
-                });
-            }
-            // Set queue to current song list and play from start
-            queue = [...currentSongList];
-            queueOriginal = queue.slice();
-            queueIndex = 0;
-            playSong(queue[0].id, queue);
+async function playAll(id = null, mediaType = null) {
+
+    let songs = [];
+
+    try {
+
+        // 1️⃣ If called from album/artist/playlist page (old behavior)
+        if (!id && currentSongList && currentSongList.length > 0) {
+            songs = currentSongList;
         }
+
+        // 2️⃣ If called with mediaType (Recent items etc)
+        else if (id && mediaType) {
+
+            if (mediaType === "album") {
+
+                const res = await fetch(`/api/album/${id}`);
+                const data = await res.json();
+
+                songs = data.songs || [];
+
+                addToRecent({
+                    id: data.id || id,
+                    title: data.name,
+                    type: "album",
+                    image: data.image?.[2]?.url || data.image?.[0]?.url || ""
+                });
+            }
+
+            else if (mediaType === "artist") {
+
+                const res = await fetch(`/api/artist/${id}/songs`);
+                const data = await res.json();
+
+                songs = data.songs || [];
+
+                addToRecent({
+                    id: id,
+                    title: data.name || "",
+                    type: "artist",
+                    image: data.image?.[2]?.url || data.image?.[0]?.url || ""
+                });
+            }
+
+            else if (mediaType === "playlist") {
+
+                const playlist = playlists[id];
+                if (!playlist) return;
+
+                songs = playlist.songs || [];
+
+                addToRecent({
+                    id: id,
+                    title: playlist.name,
+                    type: "playlist",
+                    image: playlist.image?.[2]?.url || playlist.image?.[0]?.url || ""
+                });
+            }
+
+        }
+
+        if (!songs || songs.length === 0) {
+            showToast("No songs to play");
+            return;
+        }
+
+        // 3️⃣ Build queue
+        queue = [...songs];
+        queueOriginal = queue.slice();
+        queueIndex = 0;
+
+        // 4️⃣ Start playback
+        playSong(queue[0].id, queue);
+
+    } catch (err) {
+
+        console.error("playAll error:", err);
+        showToast("Playback failed");
+
+    }
+
+}
 
         // Play all songs shuffled
         function playAllShuffled() {
