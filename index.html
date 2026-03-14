@@ -7748,61 +7748,79 @@ sidebar.addEventListener("click", (e) => {
    
 </style>
 <script>
-// Queue bottom sheet — handle-zone drag: up=expand, down=dismiss (mobile only)
-(function() {
-    document.addEventListener('DOMContentLoaded', function() {
+// Queue bottom sheet drag — translateY for dismiss, height for expand
+(function () {
+    document.addEventListener('DOMContentLoaded', function () {
         const panel = document.getElementById('queue-panel');
         const overlay = document.getElementById('queue-panel-overlay');
         if (!panel) return;
 
         const queueList = document.getElementById('queue-list');
+        const PARTIAL_H = () => Math.round(window.innerHeight * 0.75);
+        const FULL_H    = () => window.innerHeight;
+        const TRANSITION = 'height 0.35s cubic-bezier(0.32,0.72,0,1), transform 0.35s cubic-bezier(0.32,0.72,0,1), border-radius 0.35s ease';
 
         let snapState = 'partial'; // 'partial' | 'full'
-        let startY = 0;
-        let currentY = 0;
+        let startY = 0, currentY = 0;
         let isDragging = false;
+        let dragDir = null; // 'up' | 'down' — locked on first move
         let startPanelHeight = 0;
         let touchInHandleZone = false;
 
-        function snapTo(state, animate) {
+        function setSnap(state, animate) {
             snapState = state;
-            panel.style.transition = animate ? 'height 0.35s cubic-bezier(0.32,0.72,0,1)' : 'none';
+            panel.style.transition = animate ? TRANSITION : 'none';
+            panel.style.transform = 'translateY(0)';
             if (state === 'full') {
-                panel.style.height = window.innerHeight + 'px';
+                panel.style.height = FULL_H() + 'px';
                 panel.style.borderRadius = '0';
             } else {
-                panel.style.height = Math.round(window.innerHeight * 0.75) + 'px';
+                panel.style.height = PARTIAL_H() + 'px';
                 panel.style.borderRadius = '20px 20px 0 0';
             }
         }
 
-        panel.addEventListener('touchstart', function(e) {
+        function dismiss(animate) {
+            const h = panel.offsetHeight;
+            panel.style.transition = animate ? TRANSITION : 'none';
+            panel.style.transform = 'translateY(' + h + 'px)';
+            if (overlay) { overlay.style.opacity = '0'; }
+            setTimeout(function () {
+                panel.classList.remove('visible');
+                panel.style.transition = 'none';
+                panel.style.transform = '';
+                panel.style.height = '';
+                panel.style.borderRadius = '';
+                if (overlay) { overlay.classList.remove('active'); overlay.style.opacity = ''; }
+                snapState = 'partial';
+            }, animate ? 350 : 0);
+        }
+
+        panel.addEventListener('touchstart', function (e) {
             if (window.innerWidth > 768) return;
             const touch = e.touches[0];
             startY = touch.clientY;
             currentY = touch.clientY;
             isDragging = false;
+            dragDir = null;
             startPanelHeight = panel.offsetHeight;
-
-            // Check if touch is in the top handle+header zone (top 60px of panel)
             const rect = panel.getBoundingClientRect();
             touchInHandleZone = (touch.clientY - rect.top) <= 60;
         }, { passive: true });
 
-        panel.addEventListener('touchmove', function(e) {
+        panel.addEventListener('touchmove', function (e) {
             if (window.innerWidth > 768) return;
             currentY = e.touches[0].clientY;
-            const diff = currentY - startY; // +ve = finger moving down, -ve = up
+            const diff = currentY - startY; // +ve = down, -ve = up
 
             if (!isDragging) {
                 if (Math.abs(diff) < 8) return;
+                dragDir = diff < 0 ? 'up' : 'down';
 
                 if (touchInHandleZone) {
-                    // Handle zone: drag in BOTH directions freely
                     isDragging = true;
                     panel.style.transition = 'none';
-                } else if (diff > 0 && (queueList ? queueList.scrollTop : 0) <= 0) {
-                    // Body zone: only allow downward dismiss when list is at top
+                } else if (dragDir === 'down' && (queueList ? queueList.scrollTop : 0) <= 0) {
                     isDragging = true;
                     panel.style.transition = 'none';
                 } else {
@@ -7810,41 +7828,50 @@ sidebar.addEventListener("click", (e) => {
                 }
             }
 
-            const newHeight = Math.min(
-                Math.max(startPanelHeight - diff, window.innerHeight * 0.2),
-                window.innerHeight
-            );
-            panel.style.height = newHeight + 'px';
-            panel.style.borderRadius = newHeight >= window.innerHeight - 4 ? '0' : '20px 20px 0 0';
-
-            if (overlay) {
-                overlay.style.opacity = String(Math.min(1, Math.max(0, newHeight / (window.innerHeight * 0.75))));
+            if (dragDir === 'up') {
+                // Expand: grow height upward
+                const newH = Math.min(startPanelHeight + Math.abs(diff), FULL_H());
+                panel.style.transform = 'translateY(0)';
+                panel.style.height = newH + 'px';
+                panel.style.borderRadius = newH >= FULL_H() - 4 ? '0' : '20px 20px 0 0';
+            } else {
+                // Dismiss: slide panel downward with translateY, keep height fixed
+                const ty = Math.max(0, diff);
+                panel.style.transform = 'translateY(' + ty + 'px)';
+                panel.style.height = startPanelHeight + 'px';
+                if (overlay) {
+                    overlay.style.opacity = String(Math.max(0, 1 - ty / (startPanelHeight * 0.6)));
+                }
             }
         }, { passive: true });
 
-        panel.addEventListener('touchend', function() {
+        panel.addEventListener('touchend', function () {
             if (window.innerWidth > 768) return;
             if (!isDragging) return;
             isDragging = false;
 
             const diff = currentY - startY;
 
-            if (diff < -80) {
-                snapTo('full', true);
-            } else if (diff > 120 && snapState === 'partial') {
-                panel.classList.remove('visible');
-                panel.style.transition = '';
-                panel.style.height = '';
-                panel.style.borderRadius = '';
-                if (overlay) { overlay.classList.remove('active'); overlay.style.opacity = ''; }
-                snapState = 'partial';
-            } else if (diff > 80 && snapState === 'full') {
-                snapTo('partial', true);
+            if (dragDir === 'up') {
+                if (diff < -80) {
+                    setSnap('full', true);
+                } else {
+                    setSnap(snapState, true); // snap back
+                }
             } else {
-                snapTo(snapState, true);
+                if (diff > 120) {
+                    if (snapState === 'full') {
+                        setSnap('partial', true); // full → partial
+                    } else {
+                        dismiss(true); // partial → gone
+                    }
+                } else {
+                    // snap back — reset transform, keep height
+                    panel.style.transition = TRANSITION;
+                    panel.style.transform = 'translateY(0)';
+                    if (overlay) overlay.style.opacity = '';
+                }
             }
-
-            if (panel.classList.contains('visible') && overlay) overlay.style.opacity = '';
         });
     });
 })();
