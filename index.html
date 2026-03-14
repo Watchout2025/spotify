@@ -7827,10 +7827,6 @@ sidebar.addEventListener("click", (e) => {
                 } else if (dragDir === 'down' && (queueList ? queueList.scrollTop : 0) <= 0) {
                     isDragging = true;
                     panel.style.transition = 'none';
-                } else if (dragDir === 'up' && snapState === 'partial') {
-                    // Allow upward swipe from anywhere to expand
-                    isDragging = true;
-                    panel.style.transition = 'none';
                 } else {
                     return; // let list scroll
                 }
@@ -7853,6 +7849,7 @@ sidebar.addEventListener("click", (e) => {
                 }
             }
         }, { passive: true });
+
         panel.addEventListener('touchend', function () {
             if (window.innerWidth > 768) return;
             if (!isDragging) return;
