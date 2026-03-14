@@ -7772,10 +7772,14 @@ sidebar.addEventListener("click", (e) => {
             panel.style.transition = animate ? TRANSITION : 'none';
             panel.style.transform = 'translateY(0)';
             if (state === 'full') {
+                // Move panel to top by translating up by (screen height - panel height)
+                const lift = FULL_H() - PARTIAL_H();
                 panel.style.height = FULL_H() + 'px';
+                panel.style.transform = 'translateY(-' + lift + 'px)';
                 panel.style.borderRadius = '0';
             } else {
                 panel.style.height = PARTIAL_H() + 'px';
+                panel.style.transform = 'translateY(0)';
                 panel.style.borderRadius = '20px 20px 0 0';
             }
         }
@@ -7784,7 +7788,7 @@ sidebar.addEventListener("click", (e) => {
             const h = panel.offsetHeight;
             panel.style.transition = animate ? TRANSITION : 'none';
             panel.style.transform = 'translateY(' + h + 'px)';
-            if (overlay) { overlay.style.opacity = '0'; }
+            if (overlay) overlay.style.opacity = '0';
             setTimeout(function () {
                 panel.classList.remove('visible');
                 panel.style.transition = 'none';
@@ -7823,17 +7827,22 @@ sidebar.addEventListener("click", (e) => {
                 } else if (dragDir === 'down' && (queueList ? queueList.scrollTop : 0) <= 0) {
                     isDragging = true;
                     panel.style.transition = 'none';
+                } else if (dragDir === 'up' && snapState === 'partial') {
+                    // Allow upward swipe from anywhere to expand
+                    isDragging = true;
+                    panel.style.transition = 'none';
                 } else {
                     return; // let list scroll
                 }
             }
 
             if (dragDir === 'up') {
-                // Expand: grow height upward
-                const newH = Math.min(startPanelHeight + Math.abs(diff), FULL_H());
-                panel.style.transform = 'translateY(0)';
-                panel.style.height = newH + 'px';
-                panel.style.borderRadius = newH >= FULL_H() - 4 ? '0' : '20px 20px 0 0';
+                // Expand upward: translate the panel up (negative Y moves it up)
+                const maxLift = FULL_H() - startPanelHeight;
+                const lift = Math.min(Math.abs(diff), maxLift);
+                panel.style.transform = 'translateY(-' + lift + 'px)';
+                panel.style.height = startPanelHeight + 'px';
+                panel.style.borderRadius = lift >= maxLift - 4 ? '0' : '20px 20px 0 0';
             } else {
                 // Dismiss: slide panel downward with translateY, keep height fixed
                 const ty = Math.max(0, diff);
@@ -7856,7 +7865,11 @@ sidebar.addEventListener("click", (e) => {
                 if (diff < -80) {
                     setSnap('full', true);
                 } else {
-                    setSnap(snapState, true); // snap back
+                    // snap back to partial — reset transform and height
+                    panel.style.transition = TRANSITION;
+                    panel.style.transform = 'translateY(0)';
+                    panel.style.height = PARTIAL_H() + 'px';
+                    panel.style.borderRadius = '20px 20px 0 0';
                 }
             } else {
                 if (diff > 120) {
