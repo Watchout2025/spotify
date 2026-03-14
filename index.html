@@ -2196,6 +2196,8 @@
                 transition: transform 0.35s cubic-bezier(0.32, 0.72, 0, 1) !important;
                 overflow: hidden !important;
                 will-change: transform;
+                display: flex !important;
+                flex-direction: column !important;
             }
 
             .queue-panel.visible {
@@ -2210,13 +2212,14 @@
                 display: block;
                 width: 36px;
                 height: 4px;
-                background: var(--bg-tertiary);
+                background: rgba(255,255,255,0.2);
                 border-radius: 2px;
                 margin: 12px auto 4px;
                 flex-shrink: 0;
             }
 
             .queue-panel .queue-list {
+                flex: 1;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
             }
@@ -7743,42 +7746,57 @@ sidebar.addEventListener("click", (e) => {
         let currentY = 0;
         let isDragging = false;
 
-        // Allow drag from the top 56px (handle + header zone)
+        const queueList = document.getElementById('queue-list');
+
         panel.addEventListener('touchstart', function(e) {
             if (window.innerWidth > 768) return;
-            const touch = e.touches[0];
-            const rect = panel.getBoundingClientRect();
-            const relY = touch.clientY - rect.top;
-            if (relY > 56) return;
-            startY = touch.clientY;
-            currentY = touch.clientY;
-            isDragging = true;
-            panel.style.transition = 'none';
+            startY = e.touches[0].clientY;
+            currentY = e.touches[0].clientY;
+            isDragging = false; // will be set true once direction is determined
+            panel._touchStartScrollTop = queueList ? queueList.scrollTop : 0;
         }, { passive: true });
 
         panel.addEventListener('touchmove', function(e) {
-            if (!isDragging) return;
+            if (window.innerWidth > 768) return;
             currentY = e.touches[0].clientY;
             const diff = currentY - startY;
+
+            // Only start sheet drag when pulling DOWN and list is scrolled to top
+            if (!isDragging) {
+                const scrollTop = queueList ? queueList.scrollTop : 0;
+                if (diff > 8 && scrollTop <= 0) {
+                    isDragging = true;
+                    panel.style.transition = 'none';
+                } else if (Math.abs(diff) > 8) {
+                    // User is scrolling the list, don't interfere
+                    return;
+                } else {
+                    return;
+                }
+            }
+
             if (diff > 0) {
                 panel.style.transform = 'translateY(' + diff + 'px)';
-                if (overlay) overlay.style.opacity = Math.max(0, 1 - diff / 200);
+                if (overlay) overlay.style.opacity = String(Math.max(0, 1 - diff / 250));
             }
         }, { passive: true });
 
         panel.addEventListener('touchend', function() {
-            if (!isDragging) return;
-            isDragging = false;
-            panel.style.transition = '';
+            if (window.innerWidth > 768) return;
             const diff = currentY - startY;
-            if (diff > 100) {
-                panel.classList.remove('visible');
-                if (overlay) { overlay.classList.remove('active'); overlay.style.opacity = ''; }
-                panel.style.transform = '';
-            } else {
-                panel.style.transform = '';
-                if (overlay) overlay.style.opacity = '';
+            if (isDragging) {
+                isDragging = false;
+                panel.style.transition = '';
+                if (diff > 120) {
+                    panel.classList.remove('visible');
+                    if (overlay) { overlay.classList.remove('active'); overlay.style.opacity = ''; }
+                    panel.style.transform = '';
+                } else {
+                    panel.style.transform = '';
+                    if (overlay) overlay.style.opacity = '';
+                }
             }
+            isDragging = false;
         });
     });
 })();
