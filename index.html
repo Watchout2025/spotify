@@ -934,6 +934,113 @@
             text-overflow: ellipsis;
         }
 
+        /* Credits Card */
+        .credits-card {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin: 16px 0;
+            display: none;
+        }
+
+        .credits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .credits-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .credits-show-all {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .credits-show-all:hover {
+            color: var(--text-primary);
+            text-decoration: underline;
+        }
+
+        .credits-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .credits-list.collapsed .credits-item:nth-child(n+4) {
+            display: none;
+        }
+
+        .credits-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .credits-item-left {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .credits-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .credits-item-name:hover {
+            text-decoration: underline;
+        }
+
+        .credits-item-role {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 1px;
+        }
+
+        .credits-follow-btn {
+            padding: 5px 14px;
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .credits-follow-btn:hover {
+            border-color: var(--text-primary);
+            background: var(--text-primary);
+            color: var(--bg-primary);
+        }
+
+        .credits-follow-btn.followed {
+            background: var(--text-primary);
+            color: var(--bg-primary);
+            border-color: var(--text-primary);
+        }
+
         .follow-btn {
             padding: 10px 24px;
             background: transparent;
@@ -3593,17 +3700,26 @@
         </div>
     </div>
 
-    <!-- Primary Playback Controls -->
-    <div class="modalplayer-controls" style="display: flex; align-items: center; justify-content: center; gap: 24px; margin-bottom: 30px;">
+    <!-- Primary Playback Controls (Shuffle | Prev | Play | Next | Repeat) -->
+    <div class="modalplayer-controls" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 20px;">
+        <!-- Shuffle -->
+        <button id="sidebar-shuffle-btn" onclick="toggleShuffle()" title="Shuffle"
+            style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#b3b3b3">
+                <path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path>
+                <path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path>
+            </svg>
+        </button>
+
         <!-- Previous -->
-        <button onclick="skipPrev()" id="prev-track" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: none; border: none; cursor: pointer; outline: none; padding: 0;">
-            <svg width="35" height="35" viewBox="0 0 24 24" fill="#ffffff">
+        <button onclick="skipPrev()" id="prev-track" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: none; border: none; cursor: pointer; outline: none; padding: 0; flex-shrink: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff">
                 <path d="M18 5.5v13L7 12l11-6.5zM6 5a1 1 0 0 0-1 1v12a1 1 0 1 0 2 0V6a1 1 0 0 0-1-1z"/>
             </svg>
         </button>
 
         <!-- Play/Pause -->
-        <button onclick="togglePlay()" id="sidebar-play-btn" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: #ffffff; border: none; border-radius: 50%; cursor: pointer; outline: none; padding: 0;">
+        <button onclick="togglePlay()" id="sidebar-play-btn" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: #ffffff; border: none; border-radius: 50%; cursor: pointer; outline: none; padding: 0; flex-shrink: 0;">
             <svg id="sidebar-play-icon" width="24" height="24" viewBox="0 0 16 16" fill="#000000">
                 <path d="M3 1.713a.7.7 0 0 1 1.05-.607l10.89 6.288a.7.7 0 0 1 0 1.212L4.05 14.894A.7.7 0 0 1 3 14.288z"></path>
             </svg>
@@ -3613,51 +3729,39 @@
         </button>
 
         <!-- Next -->
-        <button onclick="skipNext()" id="next-track" style="display: flex; align-items: center; justify-content: center; width: 56px; height: 56px; background: none; border: none; cursor: pointer; outline: none; padding: 0;">
-            <svg width="35" height="35" viewBox="0 0 24 24" fill="#ffffff">
+        <button onclick="skipNext()" id="next-track" style="display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; background: none; border: none; cursor: pointer; outline: none; padding: 0; flex-shrink: 0;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#ffffff">
                 <path d="M6 5.5v13l11-6.5L6 5.5zM18 5a1 1 0 0 1 1 1v12a1 1 0 1 1-2 0V6a1 1 0 0 1 1-1z"/>
+            </svg>
+        </button>
+
+        <!-- Repeat -->
+        <button id="sidebar-repeat-btn" onclick="toggleRepeat()" title="Repeat"
+            style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s; flex-shrink: 0;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#b3b3b3">
+                <path d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75z"></path>
             </svg>
         </button>
     </div>
 
-    <!-- Secondary Actions Row -->
-    <div class="secondary-actions" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding: 0 4px;">
-        <!-- Left: Shuffle + Repeat -->
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <!-- Shuffle -->
-            <button id="sidebar-shuffle-btn" onclick="toggleShuffle()" title="Shuffle"
-                style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="#b3b3b3">
-                    <path d="M13.151.922a.75.75 0 1 0-1.06 1.06L13.109 3H11.16a3.75 3.75 0 0 0-2.873 1.34l-6.173 7.356A2.25 2.25 0 0 1 .39 12.5H0V14h.391a3.75 3.75 0 0 0 2.873-1.34l6.173-7.356a2.25 2.25 0 0 1 1.724-.804h1.947l-1.017 1.018a.75.75 0 0 0 1.06 1.06L15.98 3.75zM.391 3.5H0V2h.391c1.109 0 2.16.49 2.873 1.34L4.89 5.277l-.979 1.167-1.796-2.14A2.25 2.25 0 0 0 .39 3.5z"></path>
-                    <path d="m7.5 10.723.98-1.167.957 1.14a2.25 2.25 0 0 0 1.724.804h1.947l-1.017-1.018a.75.75 0 1 1 1.06-1.06l2.829 2.828-2.829 2.828a.75.75 0 1 1-1.06-1.06L13.109 13H11.16a3.75 3.75 0 0 1-2.873-1.34l-.787-.938z"></path>
-                </svg>
-            </button>
-            <!-- Repeat -->
-            <button id="sidebar-repeat-btn" onclick="toggleRepeat()" title="Repeat"
-                style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="#b3b3b3">
-                    <path d="M0 4.75A3.75 3.75 0 0 1 3.75 1h8.5A3.75 3.75 0 0 1 16 4.75v5a3.75 3.75 0 0 1-3.75 3.75H9.81l1.018 1.018a.75.75 0 1 1-1.06 1.06L6.939 12.75l2.829-2.828a.75.75 0 1 1 1.06 1.06L9.811 12h2.439a2.25 2.25 0 0 0 2.25-2.25v-5a2.25 2.25 0 0 0-2.25-2.25h-8.5A2.25 2.25 0 0 0 1.5 4.75v5A2.25 2.25 0 0 0 3.75 12H5v1.5H3.75A3.75 3.75 0 0 1 0 9.75z"></path>
-                </svg>
-            </button>
-        </div>
-        <!-- Right: Share + Queue -->
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <!-- Share -->
-            <button id="music-share-button" title="Share" onclick="shareSong()"
-                style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
-                <svg width="20" height="20" viewBox="0 -960 960 960" fill="#b3b3b3">
-                    <path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5t-38-23.5L354-480l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Z"/>
-                </svg>
-            </button>
-            <!-- Queue -->
-            <button id="music-queue-button" title="Queue" onclick="toggleQueue()"
-                style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
-                <svg width="18" height="18" viewBox="0 0 16 16" fill="#b3b3b3">
-                    <path d="M15 15H1v-1.5h14zm0-4.5H1V9h14zm-14-7A2.5 2.5 0 0 1 3.5 1h9a2.5 2.5 0 0 1 0 5h-9A2.5 2.5 0 0 1 1 3.5m2.5-1a1 1 0 0 0 0 2h9a1 1 0 1 0 0-2z"></path>
-                </svg>
-            </button>
-        </div>
-    </div>       
+    <!-- Secondary Actions Row: Share + Queue -->
+    <div class="secondary-actions" style="display: flex; justify-content: flex-end; align-items: center; margin-bottom: 20px; padding: 0 4px; gap: 8px;">
+        <!-- Share -->
+        <button id="music-share-button" title="Share" onclick="shareSong()"
+            style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+            <svg width="20" height="20" viewBox="0 -960 960 960" fill="#b3b3b3">
+                <path d="M720-80q-50 0-85-35t-35-85q0-7 1-14.5t3-13.5L322-392q-17 15-38 23.5t-44 8.5q-50 0-85-35t-35-85q0-50 35-85t85-35q23 0 44 8.5t38 23.5l282-164q-2-6-3-13.5t-1-14.5q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-23 0-44-8.5t-38-23.5L354-480l282 164q17-15 38-23.5t44-8.5q50 0 85 35t35 85q0 50-35 85t-85 35Z"/>
+            </svg>
+        </button>
+        <!-- Queue -->
+        <button id="music-queue-button" title="Queue" onclick="toggleQueue()"
+            style="background: none; border: none; cursor: pointer; padding: 6px; border-radius: 50%; outline: none; display: flex; align-items: center; justify-content: center; transition: background 0.2s;">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="#b3b3b3">
+                <path d="M15 15H1v-1.5h14zm0-4.5H1V9h14zm-14-7A2.5 2.5 0 0 1 3.5 1h9a2.5 2.5 0 0 1 0 5h-9A2.5 2.5 0 0 1 1 3.5m2.5-1a1 1 0 0 0 0 2h9a1 1 0 1 0 0-2z"></path>
+            </svg>
+        </button>
+    </div>
+
                 <!-- About Artist Card -->
                 <div id="artist-card" class="artist-card" style="display: none;">
                     <div class="artist-card-header">About the Artist</div>
@@ -3668,6 +3772,15 @@
                     </div>
                     <div class="artist-card-bio" id="artist-card-bio"></div>
                     <button class="artist-card-btn" id="artist-card-btn" onclick="toggleFollowArtist()">Follow</button>
+                </div>
+
+                <!-- Credits Card -->
+                <div class="credits-card" id="credits-card">
+                    <div class="credits-header">
+                        <span class="credits-title">Credits</span>
+                        <button class="credits-show-all" id="credits-show-all-btn" onclick="toggleCreditsExpand()">Show all</button>
+                    </div>
+                    <div class="credits-list collapsed" id="credits-list"></div>
                 </div>
 
                 <!-- Next in Queue Card -->
@@ -4894,6 +5007,7 @@ searchInput.addEventListener('input', () => {
                 });
             }
             fetchArtistForCard();
+            renderCreditsCard();
             const downloadUrl = song.downloadUrl?.find(d => d.quality === '320kbps')?.url || song.downloadUrl?.[0]?.url;
             if (!downloadUrl) {
                 showToast('No audio available for this song');
@@ -5029,6 +5143,111 @@ searchInput.addEventListener('input', () => {
                 console.error('Error fetching artist:', err);
                 document.getElementById('artist-card').style.display = 'none';
             }
+        }
+
+        // Render Credits card from currentTrack artist data
+        function renderCreditsCard() {
+            const card = document.getElementById('credits-card');
+            const list = document.getElementById('credits-list');
+            if (!card || !list) return;
+
+            if (!currentTrack) {
+                card.style.display = 'none';
+                return;
+            }
+
+            const artists = currentTrack.artists || {};
+            const primary = (artists.primary || []).map(a => ({ ...a, role: 'Main Artist' }));
+            const featured = (artists.featured || []).map(a => ({ ...a, role: 'Featured Artist' }));
+            const all = (artists.all || []);
+
+            // Build a deduped credit map: id → { name, id, role[] }
+            const creditMap = new Map();
+
+            const addCredit = (artist, role) => {
+                if (!artist || !artist.name) return;
+                const key = artist.id || artist.name;
+                if (creditMap.has(key)) {
+                    const existing = creditMap.get(key);
+                    if (!existing.roles.includes(role)) existing.roles.push(role);
+                } else {
+                    creditMap.set(key, { name: artist.name, id: artist.id || null, roles: [role] });
+                }
+            };
+
+            primary.forEach(a => addCredit(a, 'Main Artist'));
+            featured.forEach(a => addCredit(a, 'Featured Artist'));
+            // Add remaining from 'all' not already covered
+            all.forEach(a => {
+                const key = a.id || a.name;
+                if (!creditMap.has(key)) addCredit(a, 'Artist');
+            });
+
+            const credits = [...creditMap.values()];
+
+            if (credits.length === 0) {
+                card.style.display = 'none';
+                return;
+            }
+
+            // Show/hide "Show all" button
+            const showAllBtn = document.getElementById('credits-show-all-btn');
+            if (showAllBtn) showAllBtn.style.display = credits.length > 3 ? 'block' : 'none';
+
+            list.innerHTML = credits.map(credit => {
+                const isFollowed = followedArtists.some(a => a.id === credit.id);
+                const isPrimary = credit.roles.includes('Main Artist');
+                return `
+                    <div class="credits-item">
+                        <div class="credits-item-left">
+                            <span class="credits-item-name" onclick="${credit.id ? `searchArtist('${credit.id}', '${credit.name.replace(/'/g, "\\'")}')` : ''}">${credit.name}</span>
+                            <span class="credits-item-role">${credit.roles.join(' · ')}</span>
+                        </div>
+                        ${isPrimary && credit.id ? `
+                        <button class="credits-follow-btn ${isFollowed ? 'followed' : ''}"
+                            onclick="toggleCreditFollow(this, '${credit.id}', '${credit.name.replace(/'/g, "\\'")}')">
+                            ${isFollowed ? 'Following' : 'Follow'}
+                        </button>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            // Reset collapsed state
+            list.classList.add('collapsed');
+            if (showAllBtn) showAllBtn.textContent = 'Show all';
+
+            card.style.display = 'block';
+        }
+
+        let creditsExpanded = false;
+        function toggleCreditsExpand() {
+            const list = document.getElementById('credits-list');
+            const btn = document.getElementById('credits-show-all-btn');
+            if (!list || !btn) return;
+            creditsExpanded = !creditsExpanded;
+            list.classList.toggle('collapsed', !creditsExpanded);
+            btn.textContent = creditsExpanded ? 'Show less' : 'Show all';
+        }
+
+        function toggleCreditFollow(btn, artistId, artistName) {
+            const index = followedArtists.findIndex(a => a.id === artistId);
+            if (index === -1) {
+                followedArtists.push({ id: artistId, name: artistName, image: '' });
+                btn.textContent = 'Following';
+                btn.classList.add('followed');
+            } else {
+                followedArtists.splice(index, 1);
+                btn.textContent = 'Follow';
+                btn.classList.remove('followed');
+            }
+            // Also keep the main artist card in sync if it matches
+            if (currentArtistId === artistId) {
+                const mainBtn = document.getElementById('artist-card-btn');
+                if (mainBtn) mainBtn.textContent = index === -1 ? 'Following' : 'Follow';
+            }
+            storageQueue.add('followedArtists');
+            scheduleStorageSave();
+            renderFollowedArtists();
         }
 
         // Toggle follow/unfollow artist
