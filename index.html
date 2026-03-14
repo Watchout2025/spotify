@@ -7400,6 +7400,15 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+    
+const sidebar = document.getElementById("leftSidebar");
+sidebar.addEventListener("click", (e) => {
+  // Run only on mobile
+  if (window.innerWidth > 768) return;
+  if (e.target !== sidebar) {
+    sidebar.style.display = "none";
+  }
+});
 </script>
 <style>
     @media (max-width: 768px) {
